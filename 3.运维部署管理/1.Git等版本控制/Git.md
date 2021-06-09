@@ -73,5 +73,18 @@
 1. Git管理员迁出测试通过的release分支到本地仓库。
     - git pull origin release:release
 2. 将本地的release分支合并到本地master分支，然后推送到远程仓库
+    - git checkout main
+    - git merge release
+    - git push origin main:main
 3. 给本地master分支打Tag，推送到远程
-4. 迁出最新的develop
+    - git tag -a v0.0.1 -m 'v0.0.1 更新GitFlow流程'
+    - git tag   //查看所有标签
+    - git push origin v0.0.1  //推送标签到远程仓库。
+4. 迁出最新的develop分支到本地，用于合并。将本地的release分支合并到本地的develop分支，推送到远程仓库。
+    - git pull origin develop:develop
+    - git merge release
+    - git push origin develop:develop
+5. 删除本地的release分支。推送到远程。
+    - git branch -d release     //删除本地分支
+    - git push origin -d release    //删除远程分支
+    
