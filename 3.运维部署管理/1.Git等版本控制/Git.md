@@ -28,7 +28,9 @@
 5. 新建开发分支develop并推送到远程git仓库
     - git branch develop
     - git push origin develop:develop
-    - git branch -a
+    - git branch -a   
+     
+![GitFlow流程](https://img2018.cnblogs.com/blog/449809/201909/449809-20190917180954149-90433614.png)
     
 ### 2. <font color=red>准备开发环境</font>-新项目需要第一次克隆项目的开发分支代码(develop)
 **参与角色:Git管理员(配置权限)，开发人员(迁出dev开发分支，开始执行项目)**  
@@ -39,7 +41,8 @@
 2. 开发人员先克隆项目，然后再pull拉取dev分支到本地分支。
     - git clone git@github.com:syjzlee/RemoteFaker.git
     - git pull origin develop:local_develop  //拉取远程分支到本地新建的local_develop分支上。没有分支key:key参数则为当前分支。
-    
+
+![GitFlow流程](https://img2018.cnblogs.com/blog/449809/201909/449809-20190917181015368-160938245.png)
     
 ### 3. <font color=red>测试流程</font>-多个人员协作开发解决冲突以后进入测试流程
 **参与角色:Git管理员(配置测试release分支)，开发人员+测试人员(迁出release测试分支，测试修改bug)**  
@@ -64,7 +67,9 @@
     - 修改Bug
     - git push origin release:release
 4. Bug校验，测试人员接着从远程仓库迁出该release分支到本地进行bug校验。
-    - git pull origin release:release
+    - git pull origin release:release  
+    
+![GitFlow流程](https://img2018.cnblogs.com/blog/449809/201909/449809-20190917181046747-284266024.png)
     
 ### 4. <font color=red>发布流程</font>-所有Bug关闭以后，进行版本发布。
 **参与角色:Git管理员(合并release以及master分支，更新合并develop和release分支，删除release分支)**  
@@ -87,6 +92,8 @@
 5. 删除本地的release分支。推送到远程。
     - git branch -d release     //删除本地分支
     - git push origin -d release    //删除远程分支
+    
+![GitFlow流程](https://img2018.cnblogs.com/blog/449809/201909/449809-20190923113620995-207796006.png)
     
 ### 5. <font color=red>hotfix流程</font>-线上Bug紧急修复流程。
 **参与角色:Git管理员、开发人员、测试人员**  
@@ -119,4 +126,6 @@
     - git merge hotfix_20210701 //合并hotfix分支到本地develop
     - git push origin develop   //develop推送到远程
     - git branch -d hotfix_20210701 //删除本地hotfix分支
-    - git push origin -d hotfix_20210701   //推送到远程服务器
+    - git push origin -d hotfix_20210701   //推送到远程服务器  
+    
+![GitFlow流程](https://img2018.cnblogs.com/blog/449809/201909/449809-20190923113637116-520485646.png)
