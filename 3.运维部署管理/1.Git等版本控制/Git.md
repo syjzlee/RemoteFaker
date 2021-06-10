@@ -77,8 +77,8 @@
     - git merge release
     - git push origin main:main
 3. 给本地master分支打Tag，推送到远程
-    - git tag -a v0.0.1 -m 'v0.0.1 更新GitFlow流程'
-    - git tag   //查看所有标签
+    - git tag -a v0.0.1 -m 'v0.0.1 更新GitFlow流程'  //发布版本要用带附注的标签，私人时候采用轻量标签
+    - git tag   //查看所有标签, tag是git版本库的一个标记，指向某个commit的指针。
     - git push origin v0.0.1  //推送标签到远程仓库。
 4. 迁出最新的develop分支到本地，用于合并。将本地的release分支合并到本地的develop分支，推送到远程仓库。
     - git pull origin develop:develop
@@ -88,3 +88,35 @@
     - git branch -d release     //删除本地分支
     - git push origin -d release    //删除远程分支
     
+### 5. <font color=red>hotfix流程</font>-线上Bug紧急修复流程。
+**参与角色:Git管理员、开发人员、测试人员**  
+**涉及环境:git管理员的本地仓库、开发人员本地仓库、测试人员本地仓库看以及远程仓库。**   
+**涉及分支:master分支、hotfix分支、develop分支**
+    
+1. 申请hotfix 测试申请hotfix,Git管理员基于最新的master tag迁出新的本地hotfix分支并推送到远程
+    - git pull origin main:main   # 将线上远程的主分支的代码拉取到本地，此时相应的tag也拉取到了
+    - git checkout -b hot  //git tag可以查看本地标签， git ls-remote --tags origin查看远程tag
+    - git checkout -b hotfix_20210701 v0.0.1 # tag和branch有相似地方，都可以git checkout branch/tag,但是tag不可修改只是一个固定标记，想要修改得迁出新的分支。
+    - git push origin hotfix_20210701:hotfix_20210701
+
+2. 修改bug， 开发人员迁出hotfix分支到本地，用于修改bug并提交到远程
+    - git pull origin hotfix_20210701:hotfix_20210701
+    - 修改bug
+    - git push origin hotfix_20210701:hotfix_20210701
+    
+3. 测试，测试人员迁出hotfix分支到本地测试，用于验证bug
+    - git pull origin hotfix_20210701:hotfix_20210701
+    - 打包测试,验证bug
+
+3. 测试通过，Git管理员合并hotfix分支到main，然后发布main并打上tag，最后将hotfix分支合并到develop。
+    - git pull origin hotfix_20210701:hotfix_20210701  //将远程hotfix分支更新的代码迁出到本地
+    - git checkout main
+    - git merge hotfix_20210701  //合并到main分支
+    - git push origin main:main // 推送到远程
+    - git tag -a v0.0.2  -m '修改线上BUG****'  //为本次的hotfix带标签
+    - git push origin v0.0.2   // tag推送到远程
+    - git checkout develop  
+    - git merge hotfix_20210701 //合并hotfix分支到本地develop
+    - git push origin develop   //develop推送到远程
+    - git branch -d hotfix_20210701 //删除本地hotfix分支
+    - git push origin -d hotfix_20210701   //推送到远程服务器
