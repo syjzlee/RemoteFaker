@@ -4,12 +4,15 @@
 
 - [Git](#git)
   - [公司常用的GitFlow工作流程](#%E5%85%AC%E5%8F%B8%E5%B8%B8%E7%94%A8%E7%9A%84gitflow%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B)
-    - [1. <font color=red>项目启动</font>-第一次创建本地git仓库然后关联推送到远程仓库](#1-font-colorred%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8font-%E7%AC%AC%E4%B8%80%E6%AC%A1%E5%88%9B%E5%BB%BA%E6%9C%AC%E5%9C%B0git%E4%BB%93%E5%BA%93%E7%84%B6%E5%90%8E%E5%85%B3%E8%81%94%E6%8E%A8%E9%80%81%E5%88%B0%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93)
-    - [2. <font color=red>准备开发环境</font>-新项目需要第一次克隆项目的开发分支代码(develop)](#2-font-colorred%E5%87%86%E5%A4%87%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83font-%E6%96%B0%E9%A1%B9%E7%9B%AE%E9%9C%80%E8%A6%81%E7%AC%AC%E4%B8%80%E6%AC%A1%E5%85%8B%E9%9A%86%E9%A1%B9%E7%9B%AE%E7%9A%84%E5%BC%80%E5%8F%91%E5%88%86%E6%94%AF%E4%BB%A3%E7%A0%81develop)
-    - [3. <font color=red>测试流程</font>-多个人员协作开发解决冲突以后进入测试流程](#3-font-colorred%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8Bfont-%E5%A4%9A%E4%B8%AA%E4%BA%BA%E5%91%98%E5%8D%8F%E4%BD%9C%E5%BC%80%E5%8F%91%E8%A7%A3%E5%86%B3%E5%86%B2%E7%AA%81%E4%BB%A5%E5%90%8E%E8%BF%9B%E5%85%A5%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B)
-    - [4. <font color=red>发布流程</font>-所有Bug关闭以后，进行版本发布。](#4-font-colorred%E5%8F%91%E5%B8%83%E6%B5%81%E7%A8%8Bfont-%E6%89%80%E6%9C%89bug%E5%85%B3%E9%97%AD%E4%BB%A5%E5%90%8E%E8%BF%9B%E8%A1%8C%E7%89%88%E6%9C%AC%E5%8F%91%E5%B8%83)
-    - [5. <font color=red>hotfix流程</font>-线上Bug紧急修复流程。](#5-font-colorredhotfix%E6%B5%81%E7%A8%8Bfont-%E7%BA%BF%E4%B8%8Abug%E7%B4%A7%E6%80%A5%E4%BF%AE%E5%A4%8D%E6%B5%81%E7%A8%8B)
+    - [1.项目启动](#1%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8)
+    - [2.准备开发环境](#2%E5%87%86%E5%A4%87%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83)
+    - [3.测试流程](#3%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B)
+    - [4.发布流程](#4%E5%8F%91%E5%B8%83%E6%B5%81%E7%A8%8B)
+    - [5.hotfix流程](#5hotfix%E6%B5%81%E7%A8%8B)
   - [Git在自己的服务器上创建远程私人仓库](#git%E5%9C%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E5%88%9B%E5%BB%BA%E8%BF%9C%E7%A8%8B%E7%A7%81%E4%BA%BA%E4%BB%93%E5%BA%93)
+    - [1. 创建管理私人仓库的linux用户](#1-%E5%88%9B%E5%BB%BA%E7%AE%A1%E7%90%86%E7%A7%81%E4%BA%BA%E4%BB%93%E5%BA%93%E7%9A%84linux%E7%94%A8%E6%88%B7)
+    - [2. 利用已经创建好的linux用户git，在服务器创建git仓库](#2-%E5%88%A9%E7%94%A8%E5%B7%B2%E7%BB%8F%E5%88%9B%E5%BB%BA%E5%A5%BD%E7%9A%84linux%E7%94%A8%E6%88%B7git%E5%9C%A8%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%88%9B%E5%BB%BAgit%E4%BB%93%E5%BA%93)
+    - [3. 实现免密码公钥配对方式进行git clone](#3-%E5%AE%9E%E7%8E%B0%E5%85%8D%E5%AF%86%E7%A0%81%E5%85%AC%E9%92%A5%E9%85%8D%E5%AF%B9%E6%96%B9%E5%BC%8F%E8%BF%9B%E8%A1%8Cgit-clone)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -17,7 +20,8 @@
 ## [公司常用的GitFlow工作流程](https://www.cnblogs.com/fangsmile/p/11535302.html)
 涉及到的角色有git管理员、开发人员、测试人员。(往往git管理员一般也是开发人员比如开发主管)
 对应涉及到的版本控制环境 git管理员的本地仓库、开发人员的本地仓库、测试人员的本地仓库、以及远程仓库。
-### 1. <font color=red>项目启动</font>-第一次创建本地git仓库然后关联推送到远程仓库
+### 1.项目启动
+**概述:第一次创建本地git仓库然后关联推送到远程仓库**  
 **参与角色:Git管理员**  
 **涉及环境:Git管理员本地仓库、远程仓库**  
 **涉及分支:main或者main, develop分支**
@@ -47,7 +51,8 @@
      
 ![GitFlow流程](https://img-blog.csdnimg.cn/img_convert/dd02e21f448173ca9649312dcfe27818.png)
     
-### 2. <font color=red>准备开发环境</font>-新项目需要第一次克隆项目的开发分支代码(develop)
+### 2.准备开发环境
+**概述:新项目需要第一次克隆项目的开发分支代码(develop)**
 **参与角色:Git管理员(配置权限)，开发人员(迁出dev开发分支，开始执行项目)**  
 **涉及环境:Git管理员本地仓库、开发人员的本地仓库、远程仓库**  
 **涉及分支:develop分支**
@@ -59,7 +64,8 @@
 
 ![GitFlow流程](https://img-blog.csdnimg.cn/img_convert/c25205f4e503c28be7651157b96999dc.png)
     
-### 3. <font color=red>测试流程</font>-多个人员协作开发解决冲突以后进入测试流程
+### 3.测试流程
+**概述:多个人员协作开发解决冲突以后进入测试流程**
 **参与角色:Git管理员(配置测试release分支)，开发人员+测试人员(迁出release测试分支，测试修改bug)**  
 **涉及环境:git管理员的本地仓库、开发人员的本地仓库、测试人员的本地仓库、以及远程仓库。**   
 **涉及分支:develop分支,release分支**
@@ -86,7 +92,8 @@
     
 ![GitFlow流程](https://img-blog.csdnimg.cn/img_convert/42ab33c1856081002cdca4b27d02fe4b.png)
     
-### 4. <font color=red>发布流程</font>-所有Bug关闭以后，进行版本发布。
+### 4.发布流程
+**概述:所有Bug关闭以后，进行版本发布**
 **参与角色:Git管理员(合并release以及master分支，更新合并develop和release分支，删除release分支)**  
 **涉及环境:git管理员的本地仓库、以及远程仓库。**   
 **涉及分支:release分支、master分支、develop分支**
@@ -110,7 +117,8 @@
     
 ![GitFlow流程](https://img-blog.csdnimg.cn/img_convert/72a603649f9f159e9a409f86fedd1c5c.png)
     
-### 5. <font color=red>hotfix流程</font>-线上Bug紧急修复流程。
+### 5.hotfix流程
+**概述:线上Bug紧急修复流程**
 **参与角色:Git管理员、开发人员、测试人员**  
 **涉及环境:git管理员的本地仓库、开发人员本地仓库、测试人员本地仓库看以及远程仓库。**   
 **涉及分支:master分支、hotfix分支、develop分支**
@@ -148,18 +156,18 @@
 ## [Git在自己的服务器上创建远程私人仓库](http://dazuili.cn/blog/32)
 [linux服务器配置用户公钥登录](http://dazuili.cn/blog/31)   
 
-###1. 创建管理私人仓库的linux用户
+### 1. 创建管理私人仓库的linux用户
     - useradd git  // 默认会在配置的$HOME环境目录下创建一个目录git
     - passwd git   // 给普通用户git设置密码，gitclone时候会使用的到
     - su git
     
-###2. 利用已经创建好的linux用户git，在服务器创建git仓库
+### 2. 利用已经创建好的linux用户git，在服务器创建git仓库
     - mkdir ~/git/gitRepo   //git用户目录下创建存储git私人仓库的目录
     - cd ~/git/gitRepo
     - git init --bare gitTest.git   //创建了名为gitTest的仓库
     - git clone git@域名:/***/git/gitRepo/gitTest.git  //用户可以通过这种结构clone代码(此时是需要linux的git用户密码的)
      
-###3. 实现免密码公钥配对方式进行git clone
+### 3. 实现免密码公钥配对方式进行git clone
     - cd ~/git/.ssh    // 在/git目录下 创建/.ssh目录，用来存放配对连接权限的公钥
     - touch authorized_keys  //.ssh/目录下创建该文件， 这个路径信息要一致，因为/etc/ssh/sshd_config的配置中这么写的
     - chmod 600 authorized_keys  // 修改权限后，将要连接的用户的公钥写入authorized_keys中
