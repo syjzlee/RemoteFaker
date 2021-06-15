@@ -1,3 +1,37 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [操作系统篇](#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%AF%87)
+  - [进程与线程区别](#%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E5%8C%BA%E5%88%AB)
+  - [谈谈多线程并发](#%E8%B0%88%E8%B0%88%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%B9%B6%E5%8F%91)
+  - [线程同步方式(Python代码实现)](#%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E6%96%B9%E5%BC%8Fpython%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0)
+  - [线程状态切换](#%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E5%88%87%E6%8D%A2)
+  - [分页机制](#%E5%88%86%E9%A1%B5%E6%9C%BA%E5%88%B6)
+  - [分页和分段有什么区别（内存管理）](#%E5%88%86%E9%A1%B5%E5%92%8C%E5%88%86%E6%AE%B5%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86)
+  - [什么是虚拟内存？](#%E4%BB%80%E4%B9%88%E6%98%AF%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98)
+  - [颠簸(抖动)](#%E9%A2%A0%E7%B0%B8%E6%8A%96%E5%8A%A8)
+  - [进程调度算法](#%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95)
+  - [经典进程同步问题](#%E7%BB%8F%E5%85%B8%E8%BF%9B%E7%A8%8B%E5%90%8C%E6%AD%A5%E9%97%AE%E9%A2%98)
+  - [进程的状态转换](#%E8%BF%9B%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2)
+  - [进程间通信方式](#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E6%96%B9%E5%BC%8F)
+  - [僵尸进程和孤儿进程](#%E5%83%B5%E5%B0%B8%E8%BF%9B%E7%A8%8B%E5%92%8C%E5%AD%A4%E5%84%BF%E8%BF%9B%E7%A8%8B)
+  - [fork进程](#fork%E8%BF%9B%E7%A8%8B)
+  - [Socket编程](#socket%E7%BC%96%E7%A8%8B)
+  - [Linux的五种IO模型](#linux%E7%9A%84%E4%BA%94%E7%A7%8Dio%E6%A8%A1%E5%9E%8B)
+  - [IO 多路复用模型](#io-%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%E6%A8%A1%E5%9E%8B)
+    - [select](#select)
+    - [poll](#poll)
+    - [epoll](#epoll)
+    - [select、poll、epoll区别](#selectpollepoll%E5%8C%BA%E5%88%AB)
+  - [谈谈死锁](#%E8%B0%88%E8%B0%88%E6%AD%BB%E9%94%81)
+    - [死锁的概念　　　](#%E6%AD%BB%E9%94%81%E7%9A%84%E6%A6%82%E5%BF%B5)
+    - [死锁产生的原因](#%E6%AD%BB%E9%94%81%E4%BA%A7%E7%94%9F%E7%9A%84%E5%8E%9F%E5%9B%A0)
+    - [死锁产生的四个必要条件](#%E6%AD%BB%E9%94%81%E4%BA%A7%E7%94%9F%E7%9A%84%E5%9B%9B%E4%B8%AA%E5%BF%85%E8%A6%81%E6%9D%A1%E4%BB%B6)
+    - [解决死锁的基本方法](#%E8%A7%A3%E5%86%B3%E6%AD%BB%E9%94%81%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%96%B9%E6%B3%95)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 操作系统篇
 * 学习资料推荐
    - [哈工大李治军老师的OS](https://www.icourse163.org/course/HIT-1002531008)
