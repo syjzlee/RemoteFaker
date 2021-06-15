@@ -1,3 +1,43 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Python](#python)
+  - [语法基础](#%E8%AF%AD%E6%B3%95%E5%9F%BA%E7%A1%80)
+  - [语言特性篇](#%E8%AF%AD%E8%A8%80%E7%89%B9%E6%80%A7%E7%AF%87)
+    - [谈谈 Python 和其他语言的区别](#%E8%B0%88%E8%B0%88-python-%E5%92%8C%E5%85%B6%E4%BB%96%E8%AF%AD%E8%A8%80%E7%9A%84%E5%8C%BA%E5%88%AB)
+    - [Python 2和3的区别](#python-2%E5%92%8C3%E7%9A%84%E5%8C%BA%E5%88%AB)
+    - [闭包](#%E9%97%AD%E5%8C%85)
+    - [装饰器](#%E8%A3%85%E9%A5%B0%E5%99%A8)
+    - [谈谈GC](#%E8%B0%88%E8%B0%88gc)
+    - [GIL的理解(CPython特性，计算密集型用进程，IO密集用线程)](#gil%E7%9A%84%E7%90%86%E8%A7%A3cpython%E7%89%B9%E6%80%A7%E8%AE%A1%E7%AE%97%E5%AF%86%E9%9B%86%E5%9E%8B%E7%94%A8%E8%BF%9B%E7%A8%8Bio%E5%AF%86%E9%9B%86%E7%94%A8%E7%BA%BF%E7%A8%8B)
+    - [Python传参](#python%E4%BC%A0%E5%8F%82)
+    - [深拷贝和浅拷贝](#%E6%B7%B1%E6%8B%B7%E8%B4%9D%E5%92%8C%E6%B5%85%E6%8B%B7%E8%B4%9D)
+    - [鸭子类型](#%E9%B8%AD%E5%AD%90%E7%B1%BB%E5%9E%8B)
+    - [猴子补丁](#%E7%8C%B4%E5%AD%90%E8%A1%A5%E4%B8%81)
+    - [Python中的作用域](#python%E4%B8%AD%E7%9A%84%E4%BD%9C%E7%94%A8%E5%9F%9F)
+    - [函数式编程](#%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B)
+      - [lambda函数](#lambda%E5%87%BD%E6%95%B0)
+      - [map函数](#map%E5%87%BD%E6%95%B0)
+      - [reduce函数](#reduce%E5%87%BD%E6%95%B0)
+      - [filter函数](#filter%E5%87%BD%E6%95%B0)
+    - [迭代器和生成器](#%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E7%94%9F%E6%88%90%E5%99%A8)
+    - [协程](#%E5%8D%8F%E7%A8%8B)
+    - [Python 面对对象编程](#python-%E9%9D%A2%E5%AF%B9%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B)
+      - [封装](#%E5%B0%81%E8%A3%85)
+      - [继承](#%E7%BB%A7%E6%89%BF)
+      - [多态](#%E5%A4%9A%E6%80%81)
+      - [类成员](#%E7%B1%BB%E6%88%90%E5%91%98)
+      - [类成员的修饰符](#%E7%B1%BB%E6%88%90%E5%91%98%E7%9A%84%E4%BF%AE%E9%A5%B0%E7%AC%A6)
+      - [类的特殊成员](#%E7%B1%BB%E7%9A%84%E7%89%B9%E6%AE%8A%E6%88%90%E5%91%98)
+    - [Python自省指南](#python%E8%87%AA%E7%9C%81%E6%8C%87%E5%8D%97)
+    - [Python中的元编程](#python%E4%B8%AD%E7%9A%84%E5%85%83%E7%BC%96%E7%A8%8B)
+    - [设计模式](#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F)
+      - [单例模式](#%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F)
+      - [工厂模式](#%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Python
 ## 语法基础
     * 各大网站或者书太多资源了，这是基础，不会都不能干活
