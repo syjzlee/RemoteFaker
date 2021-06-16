@@ -45,20 +45,63 @@
     - [知乎龚子捷的回答](https://www.zhihu.com/question/34840297/answer/272185020)
     - [《高性能MySQL》](https://book.douban.com/subject/23008813/)
 ## 数据库系统概念
-### 数据库范式
+### [数据库范式](https://blog.csdn.net/ws13575291650/article/details/113743056)
+**目的：减少数据冗余**   
+一般的数据库只遵循第一范式，第二范式，第三范式就足够了。满足了这三个范式的数据库一般都是简单和结构清晰的，同时也不会发生insert，delete，update的操作异常。
 * 第一范式：列不可分，eg:【联系人】（姓名，性别，电话），一个联系人有家庭电话和公司电话，那么这种表结构设计就没有达到 1NF；（**即数据库表的每一列都是不可分割的原子数据项**）
-* 第二范式：有主键，保证完全依赖。eg:订单明细表【OrderDetail】（OrderID，ProductID，UnitPrice，Discount，Quantity，ProductName），Discount（折扣），Quantity（数量）完全依赖（取决）于主键（OderID，ProductID），而 UnitPrice，ProductName 只依赖于 ProductID，不符合2NF；（**例如在员工表中的身份证号码即可实现每个一员工的区分，该身份证号码即为候选键，任何一个候选键都可以被选作主键。在找不到候选键时，可额外增加属性以实现区分，如果在员工关系中，没有对其身份证号进行存储，而姓名可能会在数据库运行的某个时间重复，无法区分出实体时，设计辟如ID等不重复的编号以实现区分，被添加的编号或ID选作主键。**）
-* 第三范式：无传递依赖 (非主键列 A 依赖于非主键列B，非主键列 B 依赖于主键的情况)，eg: 订单表【Order】（OrderID，OrderDate，CustomerID，CustomerName，CustomerAddr，CustomerCity）主键是（OrderID），CustomerName，CustomerAddr，CustomerCity直接依赖的是 CustomerID（非主键列），而不是直接依赖于主键，它是通过传递才依赖于主键，所以不符合 3NF。（**第三范式（3NF）是第二范式（2NF）的一个子集，即满足第三范式（3NF）必须满足第二范式（2NF）。简
-数据库范式
-数据库范式
-而言之，第三范式（3NF）要求一个关系中不包含已在其它关系已包含的非主关键字信息。例如，存在一个部门信息表，其中每个部门有部门编号（dept_id）、部门名称、部门简介等信息。那么在员工信息表中列出部门编号后就不能再将部门名称、部门简介等与部门有关的信息再加入员工信息表中。如果不存在部门信息表，则根据第三范式（3NF）也应该构建它，否则就会有大量的数据冗余。简而言之，第三范式就是属性不依赖于其它非主属性，也就是在满足2NF的基础上，任何非主属性不得传递依赖于主属性。**）
+* 第二范式：一个表中只能保存一种实体，不能部分依赖。要有主键，保证完全依赖。eg:订单明细表【OrderDetail】（OrderID，ProductID，UnitPrice，Discount，Quantity，ProductName），Discount（折扣），Quantity（数量）完全依赖（取决）于主键（OderID，ProductID），而 UnitPrice，ProductName 只依赖于 ProductID，不符合2NF；（**例如在员工表中的身份证号码即可实现每个一员工的区分，该身份证号码即为候选键，任何一个候选键都可以被选作主键。在找不到候选键时，可额外增加属性以实现区分，如果在员工关系中，没有对其身份证号进行存储，而姓名可能会在数据库运行的某个时间重复，无法区分出实体时，设计辟如ID等不重复的编号以实现区分，被添加的编号或ID选作主键。**）
+* 第三范式：表里面的列不能出现其它表的非主键字段，不传递依赖(非主键列 A 依赖于非主键列B，非主键列 B 依赖于主键的情况)，eg: 订单表【Order】（OrderID，OrderDate，CustomerID，CustomerName，CustomerAddr，CustomerCity）主键是（OrderID），CustomerName，CustomerAddr，CustomerCity直接依赖的是 CustomerID（非主键列），而不是直接依赖于主键，它是通过传递才依赖于主键，所以不符合 3NF。（**第三范式（3NF）是第二范式（2NF）的一个子集，即满足第三范式（3NF）必须满足第二范式（2NF）。简而言之，第三范式（3NF）要求一个关系中不包含已在其它关系已包含的非主关键字信息。例如，存在一个部门信息表，其中每个部门有部门编号（dept_id）、部门名称、部门简介等信息。那么在员工信息表中列出部门编号后就不能再将部门名称、部门简介等与部门有关的信息再加入员工信息表中。如果不存在部门信息表，则根据第三范式（3NF）也应该构建它，否则就会有大量的数据冗余。简而言之，第三范式就是属性不依赖于其它非主属性，也就是在满足2NF的基础上，任何非主属性不得传递依赖于主属性。**）  
+  
+如何更好的区分三大范式：   
+
+    * 第一范式在于有没有分出多列属性，即数据库表中的所有字段值都是不可分解的原子值
+    * 第二范式是说一张表中包含了多种不同的实体属性，那么要必须分成多张表，即确保数据库表中的每一列都和主键相关，而不能只与主键的某一部分相关（主要针对联合主键而言）  
+    * 第三范式是要求已经分成了多张表，那么一张表中只能有另一张表中的id（主键），而不能有其他的任何信息（其他的信息一律用主键在另一表查询）。即确保数据表中的每一列都和主键直接相关，而不能间接相关。
+优缺点:
+
+    好处：冗余较小、结构合理
+    坏处：适当的冗余可以提升查询的性能
+    
+ 不遵循范式可能导致以下问题：
+    
+    信息重复
+    更新异常
+    插入异常
+    删除异常
+如果每张表都完全规范，性能反而会降低，考虑到商业化需求和目标，数据库的性能相对来说更要重，所以我们在规范设计的同时，也要考虑性能问题，那一般的选取是，关联查询的表不得超过三张，这也是阿里的数据库设计规范。
+
 ### 视图
 * 视图是一种虚拟的表，通常是有一个表或者多个表的行或列的子集，具有和物理表相同的功能，可以对视图进行增，删，改，查等操作。特别地，对视图的修改不影响基本表。相比多表查询，它使得我们获取数据更容易。
 ### 游标
-* 游标是对查询出来的结果集作为一个单元来有效的处理。游标可以定在该单元中的特定行，从结果集的当前行检索一行或多行，可以对结果集当前行做修改。一般不使用游标，但是需要逐条处理数据的时候，游标显得十分重要。 MySQL 检索操作返回一组称为结果集的行，这组返回的行都是与 SQL 语句相匹配的行（零行或多行），使用简单的 SELECT 语句，不存在每次一行地处理所有行的简单方法（相对于成批地处理它们）。有时需要在检索出来的行中前进或后退一行或多行，这就是使用游标的原因。游标（cursor）是一个存储在 MySQL 服务器上的数据库查询，它不是一条 SELECT 语句，而是被该语句检索出来的结果集。在存储了游标之后，应用程序可以根据需要滚动或浏览其中的数据。游标主要用于交互式应用，其中用户需要滚动屏幕上的数据，并对数据进行浏览或做出更改。
+* 游标是对查询出来的结果集作为一个单元来有效的处理。游标可以定在该单元中的特定行，从结果集的当前行检索一行或多行，可以对结果集当前行做修改。一般不使用游标，但是需要逐条处理数据的时候，游标显得十分重要。 MySQL 检索操作返回一组称为结果集的行，这组返回的行都是与 SQL 语句相匹配的行（零行或多行），使用简单的 SELECT 语句，不存在每次一行地处理所有行的简单方法（相对于成批地处理它们）。有时需要在检索出来的行中前进或后退一行或多行，这就是使用游标的原因。游标（cursor）是一个存储在 MySQL 服务器上的数据库查询，它不是一条 SELECT 语句，而是被该语句检索出来的结果集。在存储了游标之后，应用程序可以根据需要滚动或浏览其中的数据。游标主要用于交互式应用，其中用户需要滚动屏幕上的数据，并对数据进行浏览或做出更改。  
+
+优点： 
+ 
+    1、允许程序对由查询语句select返回的行集合中的每一行执行相同或不同的操作，而不是对整个行集合执行同一个操作。    
+    2、提供对基于游标位置的表中的行进行删除和更新的能力。
+    3、游标实际上作为面向集合的数据库管理系统（RDBMS）和面向行的程序设计之间的桥梁，使这两种处理方式通过游标沟通起来。
+
+原理：
+
+    游标就是把数据按照指定要求提取出相应的数据集，然后逐条进行数据处理。
+
+使用游标的顺序
+ 声名游标、打开游标、读取数据、关闭游标、删除游标。
 ### 触发器
-https://blog.csdn.net/weixin_39941298/article/details/81080353
+[触发器 trigger](https://www.cnblogs.com/aaronthon/p/13299825.html)
 * 触发器是与表相关的数据库对象，在满足定义条件时触发，并执行触发器中定义的语句集合。触发器的这种特性可以协助应用在数据库端确保数据库的完整性。
+    
+    
+    create trigger trigger_name trigger_time trigger_event  on tb_name for each row trigger_statement;
+        （1）trigger_name：要创建的触发器名称。
+        （2）tb_name：建立触发器的表名，即在哪个表上建立触发器。tb_name 必须引用永久性表。
+        （3）trigger_time：指定触发器触发的时机。以指明触发程序是在激活它的语句之前或之后触发。可以指定 before 或 after。
+        （4）trigger_event：指明激活触发程序的语句的类型。trigger_event可以是下述值之一。
+              ① insert：将新行插入表时触发程序。例如通过 insert、load data和replace语句。
+              ② update：更改某一行时激活触发程序。例如通过update语句。
+              ③ delete：从表中删除某一行时激活触发程序。例如通过delete和raplace语句。
+        （5）for each row：触发器的执行间隔，通知触发器每隔一行执行一次动作，而不是对整个表执行一次。
+        （6）trigger_statement：指定触发器所执行的 SQL 语句。可以使用 BEGIN...END 作为开始和结束
 ### 存储过程
 * 存储过程是事先经过编译并存储在数据库中的一段 SQL语句的集合。存储过程是由一些 T-SQL 语句组成的代码块，这些 T-SQL 语句代码像一个方法一样实现一些功能（对单表或多表的增删改查），然后再给这个代码块取一个名字，在用到这个功能的时候调用他就行了。存储过程具有以下特点：
     - 存储过程只在创建时进行编译，以后每次执行存储过程都不需再重新编译，而一般 SQL 语句每执行一次就编译一次，所以使用存储过程可提高数据库执行效率；
@@ -67,19 +110,43 @@ https://blog.csdn.net/weixin_39941298/article/details/81080353
     - 通过存储过程能够使没有权限的用户在控制之下间接地存取数据库，从而确保数据的安全。
 ## MySQL 基础问题
 ### 常用 SQL 语句
-* 内连接，左连接，全连接（https://jingyan.baidu.com/article/9f7e7ec098f68b6f28155407.html   https://blog.csdn.net/qq_34082034/article/details/54962531）
-* union 和union all的区别：union会对结果集进行处理排除掉相同的结果，union all 不会对结果集进行处理，不会处理掉相同的结果。
+* [内连接，左连接，全连接](https://jingyan.baidu.com/article/9f7e7ec098f68b6f28155407.html)(https://blog.csdn.net/qq_34082034/article/details/54962531)   
+
+        select a.name,b.job from A a  inner join B b on a.id=b.A_id   
+        inner join：只返回两个表中连接字段相等的行。 
+        left join：返回包括左表中的所有记录和右表中连接字段相等的记录。如果左表的某行在右表中没有匹配行，则相应的结果行中右表的所有选择列对应均为空值。
+        right join：返回包括右表中的所有记录和左表中连接字段相等的记录。如果右表的某行在左表中没有匹配行，则相应的结果行中左表的所有选择列对应均为空值。
+        full join(全外连接)：返回左右表中所有的记录和左右表中连接字段相等的记录。
+
+* [union 和union all的区别](https://www.cnblogs.com/xiangshu/articles/2054447.html)：union会对结果集进行处理排除掉相同的结果，union all 不会对结果集进行处理，不会处理掉相同的结果。    
+
+        Union因为要进行重复值扫描，所以效率低。如果合并没有刻意要删除重复行，那么就使用Union All
+        两个要联合的SQL语句 字段个数必须一样，而且字段类型要“相容”（一致）；
+        
+        select employee_id,job_id from employees union select employee_id,job_id from job_history;
+        Union：对两个结果集进行并集操作，不包括重复行，同时进行默认规则的排序；
+        Union All：对两个结果集进行并集操作，包括重复行，不进行排序；
+        Intersect：对两个结果集进行交集操作，不包括重复行，同时进行默认规则的排序；
+        Minus：对两个结果集进行差操作，不包括重复行，同时进行默认规则的排序。
 * MySQL 常用数据类型：字符串、数值、日期
 * 数据库查询语言分类
     - DQL（Data Query Language）数据查询语言DQL由SELECT子句，FROM子句，WHERE子句组成
     - DML（Data Manipulation Language）数据操纵语言DML包含INSERT，UPDATE，DELETE
-    - DDL（Data Definition Language）数据定义语言DDL用来创建数据库中的各种对象-----表、视图、 索引、同义词、聚簇等，如：CREATE TABLE/VIEW/INDEX/SYN/CLUSTER。DDL操作是隐性提交的！不能rollback
-    - DCL（Data Control Language）数据控制语言（DCL）是用来设置或者更改数据库用户或角色权限的语句，这些语句包括GRANT、DENY、REVOKE等语句，在默认状态下，只有sysadmin、dbcreator、db_owner或db_securityadmin等角色的成员才有权利执行数据控制语言。
-### in与not in,exists与not exists的区别
-* exist会针对子查询的表使用索引
+    - DDL（Data Definition Language）数据定义语言DDL用来创建数据库中的各种对象-----表、视图、 索引、同义词、聚簇等，如：CREATE TABLE/VIEW/INDEX/SYN(同义词)/CLUSTER。DDL操作是隐性提交的！不能rollback
+    - DCL（Data Control Language）数据控制语言（DCL）是用来设置或者更改数据库用户或角色权限的语句，这些语句包括GRANT、DENY、REVOKE(取消授权)等语句，在默认状态下，只有sysadmin、dbcreator、db_owner或db_securityadmin等角色的成员才有权利执行数据控制语言。
+        - Grant：授权
+        - Revoke： 取消授权
+        - Rollback：回滚(回滚到数据库上次提交的状态：Rollback;)
+            -  Rollback[work] to [savepoint]: 回退到某点
+        - Commit：提交(插入修改删除操作后只有当事务提交才能算完成)
+            - 显式提交：commit；
+            - 隐式提交：SQL命令间接完成提交(如：alter, audit, noaudit, comment, connect, disconnect, create, drop, exit, quit, grant, revoke, rename)。
+            - 设置自动提交：set autocommit on;
+### [in与not in,exists与not exists的区别](https://www.cnblogs.com/SmallStrange/p/13869958.html)
+* in与子查询一起使用的时候,只针对主查询使用索引，子查询不使用索引。（所以子查询表小的用in）
+* exist会针对子查询的表使用索引。（所以子查询表大的用exists）
 * not exist会对主子查询都会使用索引
-* in与子查询一起使用的时候,只针对主查询使用索引
-* not in则不会使用任何索引
+* not in则不会使用任何索引（所以任何情况都应该使用not exists。比not in快和安全。 not in如果子查询存在某条记录为null时候则主查询不会返回任何记录）
 * 如果查询的两个表大小相当，那么用in和exists差别不大；如果两个表中一个较小一个较大，则子查询表大的用exists，子查询表小的用in，所以无论哪个表大，用not exists都比not in 要快。
 ### drop、delete 与 truncate 的区别
 * delete 用来删除表的全部或者一部分数据行，执行delete 之后，用户需要提交 (commmit) 或者回滚(rollback) 来执行删除或者撤销删除， delete 命令会触发这个表上所有delete 触发器；
