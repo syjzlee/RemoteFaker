@@ -246,7 +246,7 @@ https://blog.csdn.net/qq_32600929/article/details/89089577
 * 外键：MyISAM 不支持外键，而 InnoDB 支持外键。
 * 存储结构：每个 MyISAM 在磁盘上存储成三个文件：第一个文件的名字以表的名字开始，扩展名指出文件类型。.frm 文件存储表定义，数据文件的扩展名为. MYD (MYData)，索引文件的扩展名是. MYI(MYIndex)。InnoDB 所有的表都保存在同一个数据文件中（也可能是多个文件，或者是独立的表空间文件），InnoDB 表的大小只受限于操作系统文件的大小，一般为 2GB。
 * CURD操作：如果执行大量的SELECT，MyISAM是更好的选择。如果你的数据执行大量的INSERT或UPDATE，出于性能方面的考虑，应该使用InnoDB表。DELETE 从性能上InnoDB更优，但DELETE FROM table时，InnoDB不会重新建立表，而是一行一行的删除，在innodb上如果要清空保存有大量数据的表，最好使用truncate table这个命令。
-## [实现MVCC](https://liuzhengyang.github.io/2017/04/18/innodb-mvcc/)
+## [实现MVCC](https://www.cnblogs.com/xuwc/p/13873611.html)
 * MVCC 全称是Multi-Version Concurrent Control，即多版本并发控制，在MVCC协议下，每个读操作会看到一个一致性的snapshot，并且可以实现非阻塞的读。MVCC允许数据具有多个版本，这个版本可以是时间戳或者是全局递增的事务ID，在同一个时间点，不同的事务看到的数据是不同的。
 * innodb会为每一行添加两个字段，分别表示该行创建的版本和删除的版本，填入的是事务的版本号，这个版本号随着事务的创建不断递增。在repeated read的隔离级别下，具体各种数据库操作的实现：
     * select：满足以下两个条件innodb会返回该行数据：该行的创建版本号小于等于当前版本号，用于保证在select操作之前所有的操作已经执行落地。该行的删除版本号大于当前版本或者为空。删除版本号大于当前版本意味着有一个并发事务将该行删除了。
