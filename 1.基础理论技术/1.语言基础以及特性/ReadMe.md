@@ -58,6 +58,7 @@
 * python2中默认类是旧式类，需要显式继承新式类（object）来创建新式类。python3中完全移除旧式类，所有类都是新式类，但仍可显式继承object类。
 * 兼容问题：six库，2to3，__future__包
 ### 闭包
+* “闭包”的本质就是函数的嵌套定义，即在函数内部再定义函数；保存了外部函数的状态信息，使函数的局部变量信息依然可以保存下来； 
 * 闭包指延伸(延伸的意思是seriers在average函数用，但在average_nums中定义的)了作用域的函数，访问定义体之外定义的非全局变量。创建一个闭包必须满足以下几点:
     - 必须有一个内嵌函数
     - 内嵌函数必须引用外部函数中的变量
@@ -127,17 +128,17 @@ def use_arg(argument):
         def wrapper(*args,**kwargs):
             print('%s is running'%fun.__name__)
             print('传入的参数 %s'%argument)
-            return fun()  
+            return fun(*args, **kwargs)  
         return wrapper
     return decorate
-@use_arg('hahhaa')
+@use_arg('hahhaa')   # 语法糖@  相当于省去了 demo = use_arg('hahhaa')(demo)， 之后直接调用demo()即可。
 def demo():
     pass
 demo()
 ```
 * 装饰器本质上是一个 Python 函数或类，它可以让其他函数或类在不需要做任何代码修改的前提下增加额外功能，装饰器的返回值也是一个函数/类对象。它经常用于有切面需求的场景，比如：插入日志、性能测试、事务处理、缓存、权限校验等场景，装饰器是解决这类问题的绝佳设计。有了装饰器，我们就可以抽离出大量与函数功能本身无关的雷同代码到装饰器中并继续重用。概括的讲，装饰器的作用就是为已经存在的对象添加额外的功能。
 
-### 谈谈GC
+### [谈谈GC](https://blog.csdn.net/m0_46090675/article/details/109672544)
 * 主要参考
     * [Python 进阶：浅析「垃圾回收机制」(上篇)](https://hackpython.com/blog/2019/07/05/Python%E8%BF%9B%E9%98%B6%EF%BC%9A%E6%B5%85%E6%9E%90%E3%80%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E3%80%8D-%E4%B8%8A%E7%AF%87/)
 * 主要使用**引用计数**进行垃圾回收
