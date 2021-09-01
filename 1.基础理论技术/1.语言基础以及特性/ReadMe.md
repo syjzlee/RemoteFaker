@@ -142,12 +142,23 @@ demo()
 * 主要参考
     * [Python 进阶：浅析「垃圾回收机制」(上篇)](https://hackpython.com/blog/2019/07/05/Python%E8%BF%9B%E9%98%B6%EF%BC%9A%E6%B5%85%E6%9E%90%E3%80%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E3%80%8D-%E4%B8%8A%E7%AF%87/)
 * 主要使用**引用计数**进行垃圾回收
+    * 引用计数就是：变量值被变量名关联的次数； 变量名与值内存地址的关联关系存放于栈区；变量值存放于堆区，内存管理回收的则是堆区的内容。简记左栈右堆
+    * 直接引用指的是从栈区出发直接引用到的内存地址。
+​    * 间接引用指的是从栈区出发引用到堆区后，再通过进一步引用才能到达的内存地址。如a=['xxx'],列表['xxx']就间接引用了'xxx'的地址
 * 通过**标记-清理**解决容器对象产生循环引用的问题
-* 通过**分代回收**以空间换时间的方式来提高垃圾回收的效率
+    * 标记/清除算法的做法是当应用程序可用的内存空间被耗尽的时，就会停止整个程序，然后进行两项工作，第一项则是标记，第二项则是清除
+    * python的垃圾回收是以引用计数为主、标记清除为辅的
+    * python的标记清除会有两个双端链表的“容器”，引用为0就放在“不可达容器”，引用不为0就放在“可达容器”，然后如果一个应用在遍历时候还遍历到了“不可达容器”则把这个对象从该容器放回“可达容器”中，最后所以的遍历结束后进行清除阶段，清除阶段将“不可达容器”的所有内容删除释放内存。
+* 通过**分代回收**以空间换时间的方式来提高垃圾回收的效率（回收依然是使用引用计数作为回收的依据）
+    * 基于引用计数的回收机制，每次回收内存，都需要把所有对象的引用计数都遍历一遍，这是非常消耗时间的，于是引入了分代回收来提高回收效率，分代回收采用的是用“空间换时间”的策略
+    * 在历经多次扫描的情况下，都没有被回收的变量，gc机制就会认为，该变量是常用变量，gc对其扫描的频率会降低，具体实现原理如下：
+        * 分代指的是根据存活时间来为变量划分不同等级（也就是不同的代）。 新定义的变量，放到新生代这个等级中，假设每隔1分钟扫描新生代一次，如果发现变量依然被引用，那么该对象的权重（权重本质就是个整数）加一，当变量的权重大于某个设定得值（假设为3），会将它移动到更高一级的青春代，青春代的gc扫描的频率低于新生代（扫描时间间隔更长），假设5分钟扫描青春代一次，这样每次gc需要扫描的变量的总个数就变少了，节省了扫描的总时间，接下来，青春代中的对象，也会以同样的方式被移动到老年代中。也就是等级（代）越高，被垃圾回收机制扫描的频率越低。
+    * 虽然分代回收可以起到提升效率的效果，但也存在一定的缺点：例如一个变量刚刚从新生代移入青春代，该变量的绑定关系就解除了，该变量应该被回收，但青春代的扫描频率低于新生代，这就到导致了应该被回收的垃圾没有得到及时地清理。
 ### GIL的理解(CPython特性，计算密集型用进程，IO密集用线程)
 * 主要参考
+    * 这个好通俗易懂[Python中的GIL(全局解释器锁)详解及解决GIL的几种方案](https://blog.csdn.net/qq_40808154/article/details/89398076)
     * [python中的GIL详解](https://www.cnblogs.com/SuKiWX/p/8804974.html)
-* **GIL是一个防止多线程并发执行机器码的Mutex：cpython解释器的内存管理不是线程安全的，保护多线程情况下对python对象的访问，cpython使用简单的锁机制避免多个线程同时执行字节码。**
+* **GIL：又叫全局解释器锁，每个线程在执行的过程中都需要先获取GIL，保证同一时刻只有一个线程在运行，目的是解决多线程同时竞争程序中的全局变量而出现的线程安全问题。它并不是python语言的特性，仅仅是由于历史的原因在CPython解释器中难以移除，因为python语言运行环境大部分默认在CPython解释器中。**
 * 缺陷 ：限制程序的多核执行，同一时间只能有一个线程执行字节码，CPU密集型程序（大量时间花在计算上）难以利用多核优势；但是IO期间会释放GIL，对IO密集型程序(大量时间花在网络传输上，资源调度)影响小。
 * 规避影响策略：CPU密集型使用多进程+进程池，IO密集型采用多线程/协程的策略；cython扩展（将python转换为c代码）
 *  GIL释放：Python会计算当前已执行的微代码数量，达到一定阈值后强制释放GIL；系统分配的时间片用完释放；IO操作时释放。
@@ -188,6 +199,7 @@ a[4].append('c')            #修改对象a中的['a', 'b']数组对象
 ### 鸭子类型
 https://www.cnblogs.com/olivertian/p/11627110.html
 * 鸭子类型就是：如果走起路来像鸭子，叫起来也像鸭子，那么它就是鸭子（If it walks like a duck and quacks like a duck, it must be a duck）。鸭子类型是编程语言中动态类型语言中的一种设计风格，一个对象的特征不是由父类决定，而是通过对象的方法决定的。（重点关注接口，不关注对象）
+* 作用： 例如list_b是一个列表，set_c是一个集合，他们都是可迭代类型，都可以通过list_a的extend方法拼接到list_a后面，这样就体现了python的灵活性了，因为按我们一般的思路，一个列表后面只能是拼接一个列表才对，可是这里却不这么限定，只要是个可迭代类型就都可以拼接，极大丰富了应用的范围。这就体现了鸭子类型的优势了，list和set都是可迭代类型（即都看起来像鸭子），只要是可迭代我就给你可拼接到一个列表的功能（只要是鸭子类型就可以做某件事
 ```python
 class Dog(Animal):
     def run(self):
@@ -198,16 +210,27 @@ class Cat(Animal):
         print('Cat is running...')
 ```
 ### 猴子补丁
+* 属性在运行时的动态替换，叫做猴子补丁（Monkey Patch）。猴子补丁的核心就是用自己的代码替换所用模块的源代码。
 * Monkey patch就是在运行时对已有的代码进行修改，达到hot patch的目的。运行时动态替换模块的方法，运行时动态增加模块的方法（慎用）
 ```python
-class Foo(object):
-    def bar(self):
-        print('Foo.bar')
-def bar(self):
-    print('Modified bar')
-Foo().bar()
-Foo.bar = bar
-Foo().bar()
+class Monkey:
+    def hello(self):
+        print('hello')
+
+    def world(self):
+        print('world')
+
+
+def other_func():
+    print("from other_func")
+
+
+
+monkey = Monkey()
+monkey.hello = monkey.world
+monkey.hello()
+monkey.world = other_func
+monkey.world()
 ```
 ### Python中的作用域
 * Python的作用域一共有4种: L （Local） 局部作用域，E （Enclosing） 闭包函数外的函数中，G （Global） 全局作用域，B （Built-in） 内建作用域。以 L –> E –> G –>B 的规则查找，即：在局部找不到，便会去局部外的局部找（例如闭包），再找不到就会去全局找，再者去内建中找。
@@ -215,7 +238,8 @@ Foo().bar()
 #### lambda函数
 * lambda 定义了一个匿名函数，lambda 并不会带来程序运行效率的提高，只会使代码更简洁。使用lambda内不要包含循环，如果有，定义函数来完成，使代码获得可重用性和更好的可读性。lambda 是为了减少单行函数的定义而存在的。
 ```python
- list(map(lambda x: x * x, [1, 2, 3, 4, 5, 6, 7, 8, 9]))
+# 可以理解为冒号:前面的是参数，后面是返回结果，  lambda 参数:返回结果
+list(map(lambda x: x * x, [1, 2, 3, 4, 5, 6, 7, 8, 9]))
 ## [1, 4, 9, 16, 25, 36, 49, 64, 81]
 ```
 #### map函数
@@ -252,23 +276,37 @@ https://blog.csdn.net/SL_World/article/details/86507872 了解生成器函数，
 
 带有yield的函数就是生成器函数，生成器比迭代器多出的功能是利用send()传入数据，所以必须理解send()和yield。yield可以理解成一个断点，生成器的每次send()和next()都会从生成器函数当前的yield顺序执行到下一个yield断点处；具体看下述代码:
 ```python
-1   def d():
-2       sum = 0
-3       value = yield sum
-4       sum = sum + value
-5       print('sum的值是：%d' % sum)
-6       value = yield (sum+5)
-7   c = d()          ## c是一个生成器，此行代码并不运行d()内容
-8   a = c.send(None) ## 
-9   print('生成器传出的值:%d' % a)
-10  a = c.send(10)
-11  print('生成器传出的值:%d' % a)
+def d():
+    print('生成器函数开始')
+    sum = 0
+    value = yield sum
+    sum = sum + value
+    print('sum的值是：%d' % sum)
+    value = yield (sum+5)
+    print('最后一次传入的value值是： ', value)
+    print('生成器函数结束')
+c = d()          ## c是一个生成器，此行代码并不运行d()内容
+a = c.send(None) ##
+print('生成器传出的值:%d' % a)
+a = c.send(10)
+print('生成器传出的值:%d' % a)
+c.send(10086)
 
+
+>>>生成器函数开始
 >>>生成器传出的值:0
 >>>sum的值是：10
 >>>生成器传出的值:15
+>>>最后一次传入的value值是：  10086
+>>>生成器函数结束
+StopIteration
 ```
-生成器的每次 result = send(num)可以理解成两步，第一步将要传递的值num传递到中断的yield处，由yield进行赋值，然后生成器函数顺序执行到下一个yield处；第二步将下一个中断点yield的表达式结果return回来赋值给result。
+生成器yield函数自己的总结(第二次): 
+
+    * 一句话总结就是 yield为断点，外部调用传值给yield左边变量，顺序执行后，到下一个yield处将右边表达式结果返回到外部。（左进向下右出）  
+    * 生成器的每次 result = send(num)可以理解成两步，第一步将要传递的值num传递到中断的yield处（赋值号左边的变量），由yield进行赋值，然后生成器函数顺序执行到下一个yield处；  
+    * 第二步将下一个中断点yield的表达式结果（赋值号和yield的右边的表达式）return回来返回给外部调用生成器函数的结果例如上面demo中的a变量；
+    * 生成器函数都有一个不存在的yield断点，这个断点处需要外部调用生成器函数时候传入None值来标记生成器函数的开始。
 
 简单来讲 result = send(num) 就是先进入生成器函数，将num传递给当前yield断点并且赋值给yield表达式的变量，然后在生成器函数中顺序执行直到遇到下一个yield表达式，然后在该yield处中断跳出生成器函数并把yield右边的计算结果return返回给外部程序result。（生成器函数必须以next(c)或者c.send(None)开始可以这么理解，生成器函数的起始位置有个不存在的yield断点，send(None)将None值传递给该yield断点，然后在实际的第一个yield断点处返回yield表达式）
 https://www.liaoxuefeng.com/wiki/897692888725344/923057403198272 廖雪峰
@@ -345,22 +383,49 @@ bob=Person('Bob',16)
     - 如果子类继承父类不做初始化，那么会自动继承父类属性。
     - 如果子类继承父类做了初始化，且不调用super初始化父类构造函数，那么子类不会自动继承父类的属性。
     - 如果子类继承父类做了初始化，且调用了super初始化了父类的构造函数，那么子类也会继承父类的属性。
-```python
+```python  调用查找顺序（python3 广度优先）
 class A:
     def __init__(self):
         print('A')
 class B(A):
     def __init__(self):
         print('B')
-        super().__init__()
+        super().__init__()   # B-A
 class C(A):
     def __init__(self):
         print('C')
-        super().__init__()
+        super().__init__()  # C-A
 class D(B, C):
     def __init__(self):
         print('D')
+        super().__init__()   # D-B-C-A
+```
+
+```python
+class A:
+    def __init__(self):
+        self.name = 'Father'
+
+class B(A):
+    pass
+
+class C(A):
+    def __init__(self):
+        pass
+
+class D(A):
+    def __init__(self):
         super().__init__()
+
+b = B()
+print(b.name)    # Father
+
+c = C()
+# print(c.name)  #  AttributeError: 'C' object has no attribute 'name'
+
+d = D()
+print(d.name)   # Father
+
 ```
 #### 多态
 * Pyhon不支持多态并且也用不到多态，多态的概念是应用于Java和C#这一类强类型语言中，而Python崇尚“鸭子类型”。
@@ -496,7 +561,7 @@ https://www.cnblogs.com/gzl420/p/10915825.html  比较全面，主要要知道ty
 ```python
 ## 通过元编程实现类自定义属性大写
 class Base(type):
-    def __new__(cls,name,bases,attrs):
+    def __new__(cls,name,bases,attrs):  #  参数依次是当前准备创建类的对象、创建类本身的名称、类继承的父类集合、创建类的方法集合
         upper_attrs={}
         for k,v in attrs.items():
             if not k.startswith("__"):
@@ -512,6 +577,87 @@ def hello():
     print("world")
 print(dir(Foo))
 ```
+当我们传入关键字参数 mataclass 时，魔术方法就生效了，这个参数会指示python解释器在创建这个Foo类时，要通过 
+Base.__new__() 来创建，在上面这个new中，我们就可以修改类的定义。比如，加上新的方法啊或者修改自定义方法的大小写输出，然后，返回修改后的定义。  
+   
+#### 关于type以及元类的总结学习   
+1. python一切皆对象，包括类；我们自己写的类其实也是相当于是由**内置元类type**生成的对象。
+```python
+class A:
+    pass
+    
+print(A().__class__)
+print(A.__class__)
+print(int.__class__)
+
+>>><class '__main__.A'>
+>>><class 'type'>
+>>><class 'type'>
+```
+
+2. 我们可以用类来创建实例对象，结合上一点类也是对象可以利用type()函数动态创建类这种对象出来。
+```python
+def func(obj):
+    print(obj.name, obj.age)
+
+A = type("my_class", (object, ), {'name': 'LJP', 'age': '999', 'func': func}) # 对应的参数依次是 类名，继承的父类，以及类的属性(类属性和类方法，注意是类属性不是实例化后的对象属性)
+a = A()
+print(a.__class__, a.name, a.age)  
+a.func()
+
+>>><class '__main__.my_class'> LJP 999
+>>>LJP 999
+```
+
+3. python3创建自己的元类（元类是创建类的"东西"）
+```python
+def func(cls):      # 因为给类添加方法以后，在生成对应的实例对象调用方法时候第一个参数都是默认的实例对象本身self，所以这边的方法第一个参数是必须的。
+    print(cls.country)
+    print('元类添加的方法')
+
+class my_metaClass(type):   # 建立自定义的元类，需要继承type类，利用type.__new__重新生成类
+    """自己的元类"""
+    def __new__(cls, class_name, father_class, attrs):
+        print(class_name)
+        print(father_class)
+        attrs['func'] = func    # 利用元类生成的新类都添加方法 "func".
+        print(attrs)
+        return type.__new__(cls, class_name, father_class, attrs)
+
+
+class Base(dict, metaclass=my_metaClass):
+    country = "CHINA"
+
+    def get_country(self):
+        print(self.country)
+
+
+class User(Base):
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+
+user_a = User('LJP', 999)
+print(user_a.country, user_a.name, user_a.age)
+user_a.func()
+
+>>>Base
+>>>(<class 'dict'>,)
+>>>{'__module__': '__main__', '__qualname__': 'Base', 'country': 'CHINA', 'get_country': <function Base.get_country at 0x1036bae18>, 'func': <function func at 0x1036ba6a8>}
+>>>User
+>>>(<class '__main__.Base'>,)
+>>>{'__module__': '__main__', '__qualname__': 'User', '__init__': <function User.__init__ at 0x1036baea0>, 'func': <function func at 0x1036ba6a8>}
+>>>CHINA LJP 999
+>>>CHINA
+>>>元类添加的方法
+```
+解析：  python3在利用自定义元类生成类的方法是通过 "关键字参数mataclass"来实现的；  具体过程是首先在当前类中（User）查找metaclass，如果没有找到就继续在父类中（Base）查找metaclass，找到了就利用
+metaclass=my_metaClass定义的my_metaClass元类来创建User类（即__new__方法，这边要记得自定义元类要继承type类）。
+
+
+
+4. 了解了元类，利用元类创建ORM[ORM理解、元类](https://www.cnblogs.com/Gaoqiking/p/10744253.html)
 ### 设计模式
 #### 单例模式
 * 单例模式（Singleton Pattern）是一种常用的软件设计模式，该模式的主要目的是确保某一个类只有一个实例存在。当你希望在整个系统中，某个类只能出现一个实例时，单例对象就能派上用场。（None就是单例）
