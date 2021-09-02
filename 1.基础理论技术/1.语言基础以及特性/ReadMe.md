@@ -272,6 +272,7 @@ Java
 * 迭代器有一种具体的迭代器类型，它是一个带状态的对象，他能在你调用next()方法的时候返回容器中的下一个值，**迭代器不会一次性把所有元素加载到内存**，而是需要的时候才生成返回结果(不同于容器)。任何实现了__iter__和__next__()方法的对象都是迭代器，__iter__返回迭代器自身，__next__返回容器中的下一个值，如果容器中没有更多元素了，则抛出StopIteration异常。迭代器每次调用next()方法的时候做两件事：为下一次调用next()方法修改状态，生成当前调用的返回结果。
 * 生成器其实是一种特殊的迭代器，这种迭代器更加优雅，它不需要写__iter__()和__next__()方法了，只需要一个yiled关键字， 生成器一定是迭代器（反之不成立），**迭代器只能迭代取出数据，而生成器除了取数据功能还可以通过send()传入数据，传入的数据可在生成器内进行计算**。
 ### 协程
+####yield
 https://blog.csdn.net/SL_World/article/details/86507872 了解生成器函数，yield的工作原理
 
 带有yield的函数就是生成器函数，生成器比迭代器多出的功能是利用send()传入数据，所以必须理解send()和yield。yield可以理解成一个断点，生成器的每次send()和next()都会从生成器函数当前的yield顺序执行到下一个yield断点处；具体看下述代码:
@@ -360,6 +361,12 @@ print (coro3.send(7))
 print (coro3.send(10))
 coro3.close()
 ```
+
+#### yield from
+#### [asyncio、async/await、aiohttp](https://www.liaoxuefeng.com/wiki/1016959663602400/1017970488768640)
+
+
+
 ### Python 面对对象编程
 #### 封装
 * 将内容封装到某处
@@ -621,7 +628,7 @@ class my_metaClass(type):   # 建立自定义的元类，需要继承type类，�
         print(class_name)
         print(father_class)
         attrs['func'] = func    # 利用元类生成的新类都添加方法 "func".
-        print(attrs)
+        print(attrs)   # 注意这边是可以接收到Base的类属性country的，这也是Django中Model的sql列属性的写法。
         return type.__new__(cls, class_name, father_class, attrs)
 
 
@@ -658,6 +665,87 @@ metaclass=my_metaClass定义的my_metaClass元类来创建User类（即__new__�
 
 
 4. 了解了元类，利用元类创建ORM[ORM理解、元类](https://www.cnblogs.com/Gaoqiking/p/10744253.html)
+
+```python
+class Field(object):
+    def __init__(self, name, column_type):
+        self.name = name
+        self.column_type = column_type
+
+    def __str__(self):
+        return '<%s:%s>' % (self.__class__.__name__, self.name)
+
+class StringField(Field):
+    def __init__(self, name):
+        super(StringField, self).__init__(name, 'varchar(100)')  # 调用super时，不用传入self
+
+
+class IntegerField(Field):
+    def __init__(self, name):
+        super(IntegerField, self).__init__(name, 'bigint')
+
+
+class ModelMetaclass(type):
+    def __new__(cls, name, bases, attrs):
+        if name == 'Model':
+            return type.__new__(cls, name, bases, attrs)
+        print('Found model: %s' % name)
+        mappings = dict()
+        for k, v in attrs.items():
+            if isinstance(v, Field):
+                print('Found mapping: %s ==> %s' % (k, v))
+                mappings[k] = v
+        for k in mappings.keys():
+            attrs.pop(k)
+        attrs['__mappings__'] = mappings  # 保存属性和列的映射关系
+        attrs['__table__'] = name  # 假设表名和类名一致
+        return type.__new__(cls, name, bases, attrs)
+
+
+class Model(dict, metaclass=ModelMetaclass):
+    def __init__(self, **kw):
+        print(kw)
+        super(Model, self).__init__(**kw)
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(r"'Model' object has no attribute '%s'" % key)
+
+    def __setattr__(self, key, value):
+        self[key] = value
+
+    def save(self):
+        fields = []
+        params = []
+        args = []
+        for k, v in self.__mappings__.items():
+            fields.append(v.name)
+            params.append('?')
+            args.append(getattr(self, k, None))
+        sql = 'insert into %s (%s) values (%s)' % (self.__table__, ','.join(fields), ','.join(params))
+        print('SQL: %s' % sql)
+        print('ARGS: %s' % str(args))
+
+
+class User(Model):
+    # 定义类的属性到列的映射：
+    id = IntegerField('id')  # 为什么在元类那边可以遍历到id这个属性呢，因为这边写的是类属性。而元类的type的第三个参数正式类属性和类方法。
+    name = StringField('username')
+    email = StringField('email')
+    password = StringField('password')
+
+
+# 创建一个实例：
+u = User(id=12345, name='Michael', email='test@orm.org', password='my-pwd')
+# 保存到数据库：
+u.save()
+```
+总结: 元类是用来创建类的，而ORM这种需要读取 字段-数据库字段 映射关系的需求就刚好通过自定义的metaclass来扫描映射关系，并存储到自身的类属性如__table__、__mappings__中；这样每个继承基类Model的类就自动映射好了类属性字段与sql表字段的关系，只需要在Model里添加save、find、delete等成员方法或类方法即可，省去了在方法中重复编写扫描 代码字段与sql字段映射关系的代码。
+
+[廖旭峰的设计编写ORM](https://www.liaoxuefeng.com/wiki/1016959663602400/1018490605531840)
+
 ### 设计模式
 #### 单例模式
 * 单例模式（Singleton Pattern）是一种常用的软件设计模式，该模式的主要目的是确保某一个类只有一个实例存在。当你希望在整个系统中，某个类只能出现一个实例时，单例对象就能派上用场。（None就是单例）
