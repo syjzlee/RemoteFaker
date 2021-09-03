@@ -753,16 +753,36 @@ u.save()
 ```python
 class Singleton(type):
     _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+    def __call__(self, *args, **kwargs):
+        print("父类的call")
+        if self not in self._instances:
+            self._instances[self] = super(Singleton, self).__call__(*args, **kwargs)
+        return self._instances[self]
 
 class Foo(metaclass=Singleton):
     pass
-foo1=Foo()
-foo2=Foo()
+    def __init__(self):
+        print("实例化的类对象")
+foo1=Foo()   # 第一次创建元类Singleton的Foo类实例对象Foo，Foo()调用元类__call__方法，该__call__方法继续调用type的__call__方法使该元类的实例对象Foo仍然为可执行的函数Foo(),所以super(Singleton, self).__call__(*args, **kwargs)就会调用Foo自己的__init__方法，最终会打印出  "实例化的类对象" 这几个字
+foo2=Foo()   # 第二次创建元类Singleton的Foo类实例对象Foo，Foo()调用元类__call__方法，此时cls._instances[]字典中已经存在Foo类，不会再调用type的__call__方法阻止了后续的Foo变为可执行的函数Foo(),进而不能调用自己的__init__方法， 此次没有打印出"实例化的类对象" 这几个字
 print(id(foo1)==id(foo2))
+```
+总结：  
+首先了解__call__函数作用， __call__函数作用是可以使类和类实例化的对象通过 实例对象()或者 类()() 的调用方式执行__call__函数的代码，即将类的实例化对象变为可以执行的函数（Call self as a function）;  
+而我们知道利用自定义的元类metaclass创建的类其实就是自定义元类的对象，所以在上面的代码中Foo()就会调用元类Singleton的__call__函数, 之后的历程详情见上方的代码注释。
+```
+class A:
+    def __call__(self, *args, **kwargs):
+        print(args)
+        print(kwargs)
+        print('__call__方法')
+
+a = A()
+a(1,2,3, test=1)
+
+>>>(1, 2, 3)
+>>>{'test': 1}
+>>>__call__方法
 ```
 2. 函数装饰器实现
 ```python
@@ -786,3 +806,54 @@ print(id(cls1) == id(cls2))
 * Python 的模块就是天然的单例模式
 #### [工厂模式](https://segmentfault.com/a/1190000013053013)
 * 工厂模式是说调用方可以通过调用一个简单函数就可以创建不同的对象。工厂模式一般包含工厂方法和抽象工厂两种模式。
+* 简单工厂的优点是可以使用户根据参数获得对应的类实例，避免了直接实例化类，降低了耦合性；缺点是可实例化的类型在编译期间已经被确定，如果增加新类 型，则需要修改工厂，不符合OCP（开闭原则）的原则。简单工厂需要知道所有要生成的类型，当子类过多或者子类层次过多时不适合使用。
+```python
+class Operation():
+    def __init__(self, num1=0, num2=0):
+        self._num1 = num1
+        self._num2 = num2
+
+    @property
+    def num1(self):
+        return self._num1
+
+    @num1.setter
+    def num1(self, num):
+        self._num1 = num
+
+    @property
+    def num2(self):
+        return self._num2
+
+    @num2.setter
+    def num2(self, num):
+        self._num2 = num
+
+    def getResult(self): 
+        pass
+        
+
+class Add(Operation):
+    def getResult(self):
+        return self._num1 + self._num2
+
+class Multi(Operation):
+    def getResult(self):
+        return self._num1 * self._num2
+
+class OperationFactory():
+    def chooseOperation(self,op):
+        if op == '+':
+            return Add()
+
+        if op == '*':
+            return Multi()
+
+num1, num2 = 10, 7
+optype = '+'
+OpeFac = OperationFactory()   # 实例化工厂对象
+OpeObject = OpeFac.chooseOperation(optype)   # 根据参数选择实例化对应的工厂产品对象
+OpeObject.num1 = num1   # 给工厂产品对象进行组装
+OpeObject.num2 = num2   # 给工厂产品对象进行组装
+print(OpeObject.getResult())    # 获取工厂产品对象的计算结果
+```
